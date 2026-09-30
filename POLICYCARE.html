@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PolicyCare - Friendly Admission & Health Intelligence</title>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
+  <style>
+    :root {
+      /* Softened, friendly modern dark slate theme */
+      --bg-dark: #0b131b;
+      --bg-gradient: radial-gradient(circle at 50% 0%, #172635 0%, #0b131b 75%);
+      --surface-dark: #121e2a;
+      --card-bg: #182838;
+      --border-color: #203548;
+      --border-hover: #00f0c2;
+      --cyan: #38bdf8;
+      --bright-teal: #00f0c2;
+      --glow-teal: rgba(0, 240, 194, 0.25);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --danger: #ef4444;
+      --danger-glow: rgba(239, 68, 68, 0.35);
+      --success: #10b981;
+      --warning: #f59e0b;
+      --radius: 16px;
+      --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background: var(--bg-dark);
+      background-image: var(--bg-gradient);
+      background-attachment: fixed;
+      color: var(--text-main);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* -----------------------------------------------------------------------------
+       HEADER & NAVIGATION
+       ----------------------------------------------------------------------------- */
+    .top-banner {
+      background: linear-gradient(90deg, #0284c7, #00f0c2, #0284c7);
+      background-size: 200% auto;
+      animation: gradientShift 5s ease infinite;
+      color: #040d12;
+      text-align: center;
+      padding: 0.45rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .header {
+      background: rgba(18, 30, 42, 0.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .nav-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.9rem;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      color: var(--text-main);
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--bright-teal), var(--cyan));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--bg-dark);
+      font-size: 1.3rem;
+      box-shadow: 0 0 18px var(--glow-teal);
+    }
+
+    .logo span {
+      background: linear-gradient(90deg, #00f0c2, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-menu {
+      display: flex;
+      gap: 1.2rem;
+      list-style: none;
+    }
+
+    .nav-link {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 0.65rem 1.1rem;
+      border-radius: 10px;
+      transition: var(--transition);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--bright-teal);
+      background: rgba(0, 240, 194, 0.12);
+      box-shadow: inset 0 0 12px rgba(0, 240, 194, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.55rem;
+      background: linear-gradient(135deg, var(--bright-teal), #0284c7);
+      color: #040d12;
+      border: none;
+      padding: 0.8rem 1.6rem;
+      border-radius: 50px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+
+    .btn:hover {
+      box-shadow: 0 0 22px var(--glow-teal);
+      transform: translateY(-3px) scale(1.02);
+    }
+
+    .btn-secondary {
+      background: rgba(24, 40, 56, 0.9);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: var(--card-bg);
+      border-color: var(--bright-teal);
+      color: var(--bright-teal);
+      box-shadow: 0 0 18px rgba(0, 240, 194, 0.15);
+    }
+
+    .sos-btn {
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      color: white;
+      border: none;
+      padding: 0.65rem 1.4rem;
+      border-radius: 50px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 0 18px var(--danger-glow);
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+      70% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    .sos-btn:hover { transform: scale(1.08); }
+
+    /* -----------------------------------------------------------------------------
+       LAYOUT & CARDS
+       ----------------------------------------------------------------------------- */
+    .main-container {
+      max-width: 1300px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      flex-grow: 1;
+      width: 100%;
+    }
+
+    .page-section {
+      display: none;
+      opacity: 0;
+      transform: translateY(15px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .page-section.active-page {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .hero-banner {
+      background: var(--surface-dark);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 3rem 2.5rem;
+      margin-bottom: 2.5rem;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 2.5rem;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+    }
+
+    .hero-text h1 {
+      font-size: 3rem;
+      line-height: 1.18;
+      font-weight: 900;
+      margin-bottom: 1rem;
+    }
+
+    .hero-text p {
+      color: var(--text-muted);
+      font-size: 1.15rem;
+      margin-bottom: 2rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.8rem;
+    }
+
+    .card {
+      background: var(--surface-dark);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-8px) scale(1.015);
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.5), 0 0 24px rgba(0, 240, 194, 0.2);
+    }
+
+    .card-img-wrapper {
+      width: 100%;
+      height: 200px;
+      overflow: hidden;
+    }
+
+    .card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: var(--transition);
+    }
+
+    .card:hover .card-img {
+      transform: scale(1.08);
+      filter: brightness(1.08);
+    }
+
+    .card-content {
+      padding: 1.6rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .card-tag {
+      font-family: monospace;
+      color: var(--bright-teal);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .card-title {
+      font-size: 1.35rem;
+      margin-bottom: 0.6rem;
+      color: var(--text-main);
+      font-weight: 800;
+    }
+
+    .card-text {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+      flex-grow: 1;
+    }
+
+    .wireframe-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+
+    .form-card {
+      background: var(--surface-dark);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 2.5rem;
+      max-width: 800px;
+      margin: 0 auto;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.5);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+    }
+
+    .form-group { margin-bottom: 1rem; }
+    .form-group.full-width { grid-column: span 2; }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.4rem;
+      color: var(--text-muted);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      background: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      color: var(--text-main);
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .form-control:focus {
+      border-color: var(--bright-teal);
+      box-shadow: 0 0 14px var(--glow-teal);
+    }
+
+    .badge {
+      padding: 0.35rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: inline-block;
+    }
+    .badge-success { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .badge-danger { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .badge-warning { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition);
+    }
+
+    .modal-overlay.active { opacity: 1; pointer-events: all; }
+
+    .modal {
+      background: var(--surface-dark);
+      border: 1px solid var(--bright-teal);
+      padding: 2.2rem;
+      border-radius: var(--radius);
+      width: 90%;
+      max-width: 600px;
+      position: relative;
+      box-shadow: 0 0 35px var(--glow-teal);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1rem; right: 1rem;
+      background: none; border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .modal-close:hover { color: var(--bright-teal); }
+
+    /* -----------------------------------------------------------------------------
+       AI VOICE ASSISTANT & CHATBOT WIDGET
+       ----------------------------------------------------------------------------- */
+    .ai-widget-trigger {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--bright-teal), #0284c7);
+      box-shadow: 0 8px 24px rgba(0, 240, 194, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1500;
+      transition: var(--transition);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .ai-widget-trigger:hover {
+      transform: scale(1.12) rotate(6deg);
+      box-shadow: 0 12px 32px rgba(0, 240, 194, 0.6);
+    }
+
+    .ai-widget-trigger i {
+      font-size: 1.6rem;
+      color: var(--bg-dark);
+    }
+
+    .ai-chat-window {
+      position: fixed;
+      bottom: 100px;
+      right: 25px;
+      width: 380px;
+      height: 520px;
+      background: var(--surface-dark);
+      border: 1px solid var(--bright-teal);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 20px var(--glow-teal);
+      display: flex;
+      flex-direction: column;
+      z-index: 1500;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+      pointer-events: none;
+      transition: var(--transition);
+    }
+
+    .ai-chat-window.open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: all;
+    }
+
+    .ai-chat-header {
+      background: linear-gradient(135deg, var(--card-bg), var(--surface-dark));
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .ai-chat-header .title-box {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .ai-chat-header h4 {
+      font-size: 1rem;
+      color: var(--text-main);
+    }
+
+    .ai-chat-body {
+      flex-grow: 1;
+      padding: 1rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: flex-col;
+      gap: 0.8rem;
+    }
+
+    .chat-bubble {
+      max-width: 85%;
+      padding: 0.75rem 1rem;
+      border-radius: 14px;
+      font-size: 0.88rem;
+      line-height: 1.45;
+      margin-bottom: 0.5rem;
+    }
+
+    .chat-bubble.bot {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      align-self: flex-start;
+      border-top-left-radius: 2px;
+    }
+
+    .chat-bubble.user {
+      background: linear-gradient(135deg, var(--bright-teal), #0284c7);
+      color: #040d12;
+      font-weight: 600;
+      align-self: flex-end;
+      margin-left: auto;
+      border-top-right-radius: 2px;
+    }
+
+    .ai-chat-footer {
+      padding: 0.8rem;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      gap: 0.5rem;
+      background: var(--surface-dark);
+    }
+
+    .voice-btn {
+      background: rgba(0, 240, 194, 0.15);
+      color: var(--bright-teal);
+      border: 1px solid var(--bright-teal);
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .voice-btn.listening {
+      background: var(--danger);
+      color: white;
+      border-color: var(--danger);
+      animation: pulse 1.5s infinite;
+    }
+
+    .voice-btn:hover { transform: scale(1.05); }
+
+    .footer {
+      background: var(--surface-dark);
+      border-top: 1px solid var(--border-color);
+      padding: 2.5rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: auto;
+    }
+
+    @media (max-width: 850px) {
+      .hero-banner { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-group.full-width { grid-column: span 1; }
+      .nav-menu { display: none; }
+      .ai-chat-window { width: 90%; right: 5%; bottom: 90px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ANNOUNCEMENT BANNER -->
+  <div class="top-banner">
+    ⚡ POLICYCARE ENGINE v2.4 • REAL-TIME AI ADMISSION ROUTING & ASSISTANT ACTIVE
+  </div>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="nav-container">
+      <div class="logo" onclick="navigateTo('dashboard')">
+        <div class="logo-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+        Policy<span>Care</span>
+      </div>
+      
+      <ul class="nav-menu">
+        <li><a class="nav-link active" id="nav-dashboard" onclick="navigateTo('dashboard')"><i class="fa-solid fa-chart-pie"></i> Dashboard</a></li>
+        <li><a class="nav-link" id="nav-registration" onclick="navigateTo('registration')"><i class="fa-solid fa-hospital-user"></i> Admission</a></li>
+        <li><a class="nav-link" id="nav-hospitals" onclick="navigateTo('hospitals')"><i class="fa-solid fa-square-h"></i> Hospitals</a></li>
+        <li><a class="nav-link" id="nav-policies" onclick="navigateTo('policies')"><i class="fa-solid fa-shield-halved"></i> Insurance</a></li>
+        <li><a class="nav-link" id="nav-care" onclick="navigateTo('care')"><i class="fa-solid fa-hand-holding-medical"></i> Care Continuity</a></li>
+        <li><a class="nav-link" id="nav-contact" onclick="navigateTo('contact')"><i class="fa-solid fa-envelope"></i> Contact</a></li>
+      </ul>
+
+      <button class="sos-btn" onclick="triggerSOS()"><i class="fa-solid fa-triangle-exclamation"></i> SOS EMERGENCY</button>
+    </div>
+  </header>
+
+  <main class="main-container">
+
+    <!-- 1. DASHBOARD PAGE -->
+    <section id="dashboard" class="page-section active-page">
+      <div class="hero-banner">
+        <div class="hero-text">
+          <h1>Compassionate & Smart Health Intelligence</h1>
+          <p>Real-time admission feasibility, hospital capacity tracking, and automated insurance policy matching designed to support patients when it matters most.</p>
+          <div style="display:flex; gap:1rem;">
+            <button class="btn" onclick="navigateTo('registration')"><i class="fa-solid fa-notes-medical"></i> Start Admission Triage</button>
+            <button class="btn btn-secondary" onclick="navigateTo('hospitals')"><i class="fa-solid fa-hospital"></i> Network Hospitals</button>
+          </div>
+        </div>
+
+        <div class="wireframe-box">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
+            <h4 style="color: var(--bright-teal); font-size: 0.95rem;"><i class="fa-solid fa-wave-square"></i> Live Network Occupancy Sync</h4>
+            <span class="badge badge-success">Live Stream</span>
+          </div>
+          <canvas id="occupancyChart" height="180"></canvas>
+        </div>
+      </div>
+
+      <h2 style="margin-bottom: 1.2rem; font-size: 1.5rem;"><i class="fa-solid fa-cubes"></i> Core Operational Intelligence</h2>
+      <div class="grid">
+        
+        <div class="card" onclick="navigateTo('hospitals')">
+          <div class="card-img-wrapper">
+            <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=600&q=80" alt="Hospital Monitoring" class="card-img" />
+          </div>
+          <div class="card-content">
+            <div class="card-tag">Capacity & Monitoring</div>
+            <h3 class="card-title">Hospital Bed Tracking</h3>
+            <p class="card-text">Live updates on available ICU beds, life-support systems, and specialized medical staff across network nodes.</p>
+            <button class="btn btn-secondary"><i class="fa-solid fa-arrow-right"></i> Inspect Capacity</button>
+          </div>
+        </div>
+
+        <div class="card" onclick="navigateTo('policies')">
+          <div class="card-img-wrapper">
+            <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=600&q=80" alt="Insurance Policy" class="card-img" />
+          </div>
+          <div class="card-content">
+            <div class="card-tag">Coverage AI</div>
+            <h3 class="card-title">Policy & Scheme Matching</h3>
+            <p class="card-text">Compare public healthcare schemes and private insurance rules to drastically reduce out-of-pocket patient costs.</p>
+            <button class="btn btn-secondary"><i class="fa-solid fa-arrow-right"></i> Check Coverage</button>
+          </div>
+        </div>
+
+        <div class="card" onclick="navigateTo('care')">
+          <div class="card-img-wrapper">
+            <img src="https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&w=600&q=80" alt="Care Continuity" class="card-img" />
+          </div>
+          <div class="card-content">
+            <div class="card-tag">Post-Discharge</div>
+            <h3 class="card-title">Care Continuity Systems</h3>
+            <p class="card-text">Automate post-admission home nursing schedules, virtual check-ups, and home medication dispatch workflows.</p>
+            <button class="btn btn-secondary"><i class="fa-solid fa-arrow-right"></i> Manage Care</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 2. REGISTRATION / ADMISSION PAGE -->
+    <section id="registration" class="page-section">
+      <div class="form-card">
+        <h2 style="margin-bottom:0.3rem; color:var(--bright-teal);"><i class="fa-solid fa-user-plus"></i> Patient Admission & Triage</h2>
+        <p style="color:var(--text-muted); margin-bottom:1.8rem;">Fill out patient criteria to perform automated feasibility calculations and node routing.</p>
+
+        <form id="patientForm" onsubmit="handleRegistrationSubmit(event)">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" id="patientName" class="form-control" placeholder="e.g. Sarah Jenkins" required />
+            </div>
+            <div class="form-group">
+              <label>Specialty Required</label>
+              <select id="patientSpecialty" class="form-control" required>
+                <option value="Cardiology">Cardiology</option>
+                <option value="Neurology">Neurology</option>
+                <option value="Orthopedics">Orthopedics</option>
+                <option value="Emergency Care">Emergency Care</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Urgency Profile</label>
+              <select id="urgencyLevel" class="form-control" required>
+                <option value="Emergency">Emergency (Immediate ICU)</option>
+                <option value="Urgent">Urgent Admission</option>
+                <option value="Routine">Routine Inspection</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Insurance Provider / Scheme</label>
+              <select id="patientPolicy" class="form-control" required>
+                <option value="Universal Care Scheme">Universal Care Scheme</option>
+                <option value="Gold Health Shield">Gold Health Shield</option>
+                <option value="Medicare Advantage Plan">Medicare Advantage Plan</option>
+                <option value="Out-of-Pocket">Out-of-Pocket / Cash</option>
+              </select>
+            </div>
+            <div class="form-group full-width">
+              <label>Target Medical Center</label>
+              <select id="preferredHospital" class="form-control" required>
+                <option value="St. Jude Wellness & Heart Center">St. Jude Wellness & Heart Center</option>
+                <option value="Apex Medical & Trauma Hospital">Apex Medical & Trauma Hospital</option>
+                <option value="Metro Neuroscience & ICU Hub">Metro Neuroscience & ICU Hub</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn" style="width:100%; margin-top:1.5rem;"><i class="fa-solid fa-calculator"></i> Calculate Admission Feasibility</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 3. HOSPITALS PAGE -->
+    <section id="hospitals" class="page-section">
+      <div style="margin-bottom: 2rem;">
+        <h2><i class="fa-solid fa-hospital-user"></i> Network Hospital Nodes</h2>
+        <p style="color: var(--text-muted);">Real-time metrics, intensive care bed availability, and specialty routing details.</p>
+      </div>
+      <div class="grid" id="hospitalsGrid"></div>
+    </section>
+
+    <!-- 4. POLICIES PAGE -->
+    <section id="policies" class="page-section">
+      <div style="margin-bottom: 2rem;">
+        <h2><i class="fa-solid fa-file-contract"></i> Insurance & Scheme Coverage Engine</h2>
+        <p style="color: var(--text-muted);">Compare supported insurance coverage limits, pre-authorization guidelines, and benefit terms.</p>
+      </div>
+      <div class="grid" id="policiesGrid"></div>
+    </section>
+
+    <!-- 5. CARE CONTINUITY PAGE -->
+    <section id="care" class="page-section">
+      <div style="margin-bottom: 2rem;">
+        <h2><i class="fa-solid fa-heart-circle-check"></i> Post-Discharge Care Systems</h2>
+        <p style="color: var(--text-muted);">Automated follow-ups, home nursing teams, and prescription delivery network.</p>
+      </div>
+      <div class="grid" id="careGrid"></div>
+    </section>
+
+    <!-- SUB-PAGES -->
+    <section id="home-care-booking" class="page-section">
+      <div class="form-card">
+        <h3><i class="fa-solid fa-house-medical"></i> Schedule Home Care Assistance</h3>
+        <p style="color:var(--text-muted); margin-bottom:1.5rem;">Request skilled nursing or physical rehabilitation at home.</p>
+        <form onsubmit="handleSubSubmit(event, 'Home Care Dispatch Confirmed!')">
+          <div class="form-group">
+            <label>Patient ID / Name</label>
+            <input type="text" class="form-control" placeholder="e.g. John Miller" required />
+          </div>
+          <div class="form-group">
+            <label>Service Type</label>
+            <select class="form-control">
+              <option>24/7 ICU Trained Nurse</option>
+              <option>Post-Operative Physical Therapy</option>
+              <option>Elderly Care Monitoring</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Start Date</label>
+            <input type="date" class="form-control" required />
+          </div>
+          <button type="submit" class="btn" style="width:100%;">Confirm Home Booking</button>
+          <button type="button" class="btn btn-secondary" style="width:100%; margin-top:0.8rem;" onclick="navigateTo('care')">← Back to Care Hub</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="prescription-booking" class="page-section">
+      <div class="form-card">
+        <h3><i class="fa-solid fa-truck-medical"></i> Prescription Express Delivery</h3>
+        <p style="color:var(--text-muted); margin-bottom:1.5rem;">Automated home delivery dispatch for post-discharge medications.</p>
+        <form onsubmit="handleSubSubmit(event, 'Medication Dispatch Initiated!')">
+          <div class="form-group">
+            <label>Prescription Code (Rx Number)</label>
+            <input type="text" class="form-control" placeholder="RX-992041" required />
+          </div>
+          <div class="form-group">
+            <label>Delivery Residential Address</label>
+            <input type="text" class="form-control" placeholder="123 Health Ave, Suite 4" required />
+          </div>
+          <button type="submit" class="btn" style="width:100%;">Dispatch Order Now</button>
+          <button type="button" class="btn btn-secondary" style="width:100%; margin-top:0.8rem;" onclick="navigateTo('care')">← Back to Care Hub</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 6. CONTACT PAGE -->
+    <section id="contact" class="page-section">
+      <div class="form-card">
+        <h3><i class="fa-solid fa-headset"></i> Connect with Integration Team</h3>
+        <p style="color:var(--text-muted); margin-bottom:1.5rem;">Reach out for custom hospital API integrations or enterprise policy onboarding.</p>
+        <form onsubmit="handleSubSubmit(event, 'Inquiry Successfully Transmitted!')">
+          <div class="form-group"><label>Your Name</label><input type="text" class="form-control" required/></div>
+          <div class="form-group"><label>Official Email</label><input type="email" class="form-control" required/></div>
+          <div class="form-group"><label>Inquiry Message</label><textarea class="form-control" rows="4" required></textarea></div>
+          <button type="submit" class="btn" style="width:100%;">Submit Message</button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- AI VOICE ASSISTANT & CHATBOT WIDGET -->
+  <div class="ai-widget-trigger" onclick="toggleAIChat()" title="Open PolicyCare Voice AI">
+    <i class="fa-solid fa-robot"></i>
+  </div>
+
+  <div class="ai-chat-window" id="aiChatWindow">
+    <div class="ai-chat-header">
+      <div class="title-box">
+        <i class="fa-solid fa-brain" style="color: var(--bright-teal);"></i>
+        <div>
+          <h4>PolicyCare AI Assistant</h4>
+          <span style="font-size:0.75rem; color:var(--bright-teal);">● Voice & Text Active</span>
+        </div>
+      </div>
+      <button class="modal-close" style="position:static;" onclick="toggleAIChat()">✕</button>
+    </div>
+    <div class="ai-chat-body" id="chatBody">
+      <div class="chat-bubble bot">
+        Hello! I'm your PolicyCare Voice & Text AI. Ask me about hospital ICU availability, policy coverage terms, or home care bookings!
+      </div>
+    </div>
+    <div class="ai-chat-footer">
+      <button class="voice-btn" id="voiceBtn" onclick="toggleVoiceRecognition()" title="Voice Input">
+        <i class="fa-solid fa-microphone"></i>
+      </button>
+      <input type="text" id="chatInput" class="form-control" placeholder="Ask AI a health question..." onkeydown="if(event.key==='Enter') sendChatMessage()" />
+      <button class="btn" style="padding: 0 1rem; border-radius: 10px;" onclick="sendChatMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <!-- MODAL DIALOG -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>© 2026 PolicyCare | Admission & Health Intelligence Platform</p>
+    <p style="margin-top:0.5rem; color:#64748b;">Healthcare Decision Support System • All rights reserved</p>
+  </footer>
+
+  <script>
+    // DATA LAYER WITH WARM, RELEVANT IMAGES (FIRST IMAGE HAS BEEN REPLACED)
+    const hospitalsList = [
+      {
+        id: 'hosp-1',
+        name: 'St. Jude Wellness & Heart Center',
+        specialty: 'Cardiology & Emergency',
+        icuBeds: 8,
+        totalBeds: 120,
+        status: 'Operational',
+        badge: 'badge-success',
+        image: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=600&q=80',
+        description: 'Bright, modern emergency medical center equipped with advanced cardiac labs, friendly care teams, and 24/7 ICU units.',
+        alternative: null
+      },
+      {
+        id: 'hosp-2',
+        name: 'Apex Medical & Trauma Hospital',
+        specialty: 'Orthopedics & Trauma',
+        icuBeds: 0,
+        totalBeds: 85,
+        status: 'ICU Full',
+        badge: 'badge-danger',
+        image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=600&q=80',
+        description: 'Level-1 accredited surgical and trauma center. High volume orthopedics facility currently operating at full ICU capacity.',
+        alternative: 'St. Jude Wellness & Heart Center'
+      },
+      {
+        id: 'hosp-3',
+        name: 'Metro Neuroscience & ICU Hub',
+        specialty: 'Neurology & Neurosurgery',
+        icuBeds: 5,
+        totalBeds: 90,
+        status: 'Operational',
+        badge: 'badge-success',
+        image: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=600&q=80',
+        description: 'Specialized neuro-critical institute offering advanced stroke recovery, spinal treatment, and compassionate rehabilitation care.',
+        alternative: null
+      }
+    ];
+
+    const policiesList = [
+      {
+        id: 'pol-1',
+        name: 'Universal Care Scheme',
+        type: 'Government Public Scheme',
+        coverage: '100% Cashless Coverage',
+        maxLimit: '$50,000 / Year',
+        badge: 'badge-success',
+        image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=600&q=80',
+        details: 'Full protection for emergency procedures, inpatient stays, and chronic illness support with zero copayments or unexpected out-of-pocket costs.'
+      },
+      {
+        id: 'pol-2',
+        name: 'Gold Health Shield',
+        type: 'Private Preferred Policy',
+        coverage: '80% Tier Coverage',
+        maxLimit: '$150,000 / Year',
+        badge: 'badge-warning',
+        image: 'https://images.unsplash.com/photo-1581056771107-24ca5f033842?auto=format&fit=crop&w=600&q=80',
+        details: 'Comprehensive health shield providing private room accommodations, elective care access, and dedicated post-discharge nurse visits.'
+      },
+      {
+        id: 'pol-3',
+        name: 'Medicare Advantage Plan',
+        type: 'Senior Protection Insurance',
+        coverage: '90% Comprehensive',
+        maxLimit: '$100,000 / Year',
+        badge: 'badge-success',
+        image: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&w=600&q=80',
+        details: 'Designed specifically for senior wellness, providing zero-copay physical therapy, free prescription home delivery, and dedicated care managers.'
+      }
+    ];
+
+    // UPDATED REPLACEMENT PICTURE: Friendly Nurse / Senior Care support picture (Replaces injection photo)
+    const careList = [
+      {
+        id: 'care-1',
+        name: '24/7 Skilled Home Nursing',
+        category: 'In-Home Medical Care',
+        image: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&w=600&q=80',
+        description: 'Compassionate, certified nurses providing vitals tracking, post-operative recovery, and friendly wellness care in the comfort of home.',
+        route: 'home-care-booking'
+      },
+      {
+        id: 'care-2',
+        name: 'Automated Pharmacy Delivery',
+        category: 'Medication Logistics',
+        image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=600&q=80',
+        description: 'Seamless dispatch of essential recovery medications delivered straight to the patient doorstep following hospital discharge.',
+        route: 'prescription-booking'
+      }
+    ];
+
+    // NAVIGATION
+    function navigateTo(pageId) {
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      const activeNav = document.getElementById(`nav-${pageId}`);
+      if(activeNav) activeNav.classList.add('active');
+
+      document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active-page'));
+      const page = document.getElementById(pageId);
+      if(page) page.classList.add('active-page');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // CARDS GENERATION
+    function renderDynamicCards() {
+      document.getElementById('hospitalsGrid').innerHTML = hospitalsList.map(h => `
+        <div class="card" onclick="showHospitalDetails('${h.id}')">
+          <div class="card-img-wrapper">
+            <img src="${h.image}" alt="${h.name}" class="card-img" />
+          </div>
+          <div class="card-content">
+            <div class="card-tag">${h.specialty}</div>
+            <h3 class="card-title">${h.name}</h3>
+            <p class="card-text">${h.description}</p>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+              <span style="font-size:0.9rem; color:var(--text-muted);">Available ICU Beds: <strong>${h.icuBeds}</strong></span>
+              <span class="badge ${h.badge}">${h.status}</span>
+            </div>
+            <button class="btn btn-secondary"><i class="fa-solid fa-circle-info"></i> View Details</button>
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById('policiesGrid').innerHTML = policiesList.map(p => `
+        <div class="card" onclick="showPolicyDetails('${p.id}')">
+          <div class="card-img-wrapper">
+            <img src="${p.image}" alt="${p.name}" class="card-img" />
+          </div>
+          <div class="card-content">
+            <div class="card-tag">${p.type}</div>
+            <h3 class="card-title">${p.name}</h3>
+            <p class="card-text">${p.details}</p>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+              <span style="font-size:0.9rem; color:var(--bright-teal);"><strong>${p.coverage}</strong></span>
+              <span class="badge ${p.badge}">Verified</span>
+            </div>
+            <button class="btn btn-secondary"><i class="fa-solid fa-file-invoice"></i> Inspect Terms</button>
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById('careGrid').innerHTML = careList.map(c => `
+        <div class="card" onclick="navigateTo('${c.route}')">
+          <div class="card-img-wrapper">
+            <img src="${c.image}" alt="${c.name}" class="card-img" />
+          </div>
+          <div class="card-content">
+            <div class="card-tag">${c.category}</div>
+            <h3 class="card-title">${c.name}</h3>
+            <p class="card-text">${c.description}</p>
+            <button class="btn btn-secondary"><i class="fa-solid fa-calendar-check"></i> Book Care Service</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // MODAL DIALOGS
+    function showHospitalDetails(id) {
+      const h = hospitalsList.find(item => item.id === id);
+      openModal(`
+        <div style="text-align:center; margin-bottom:1rem;">
+          <img src="${h.image}" style="width:100%; height:220px; object-fit:cover; border-radius:12px; margin-bottom:1rem;" />
+          <h2 style="color:var(--bright-teal);">${h.name}</h2>
+          <span class="badge ${h.badge}" style="margin-top:0.4rem;">${h.status}</span>
+        </div>
+        <div style="color:var(--text-main); font-size:0.95rem; line-height:1.8;">
+          <p><strong>Specialty Ward:</strong> ${h.specialty}</p>
+          <p><strong>ICU Capacity:</strong> ${h.icuBeds} free beds / ${h.totalBeds} total capacity</p>
+          <p style="margin-top:0.5rem; color:var(--text-muted);">${h.description}</p>
+          ${h.alternative ? `<div style="background:var(--danger-glow); padding:0.8rem; border-radius:8px; border:1px solid var(--danger); margin-top:1rem; color:#f87171;">⚠️ <strong>Capacity Notice:</strong> Direct ICU capacity full. Rerouting to: <strong>${h.alternative}</strong>.</div>` : ''}
+        </div>
+        <button class="btn" style="width:100%; margin-top:1.5rem;" onclick="closeModal(); navigateTo('registration');">Proceed to Admission</button>
+      `);
+    }
+
+    function showPolicyDetails(id) {
+      const p = policiesList.find(item => item.id === id);
+      openModal(`
+        <div style="text-align:center; margin-bottom:1rem;">
+          <img src="${p.image}" style="width:100%; height:220px; object-fit:cover; border-radius:12px; margin-bottom:1rem;" />
+          <h2 style="color:var(--bright-teal);">${p.name}</h2>
+          <span class="badge ${p.badge}">${p.type}</span>
+        </div>
+        <div style="color:var(--text-main); font-size:0.95rem; line-height:1.8;">
+          <p><strong>Coverage:</strong> ${p.coverage}</p>
+          <p><strong>Max Limit:</strong> ${p.maxLimit}</p>
+          <p style="margin-top:0.5rem; color:var(--text-muted);">${p.details}</p>
+        </div>
+        <button class="btn" style="width:100%; margin-top:1.5rem;" onclick="closeModal(); navigateTo('registration');">Apply Policy to Triage</button>
+      `);
+    }
+
+    // AI CHATBOT & VOICE LOGIC
+    let isListening = false;
+    let recognition = null;
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('chatInput').value = transcript;
+        sendChatMessage();
+      };
+
+      recognition.onend = () => {
+        isListening = false;
+        document.getElementById('voiceBtn').classList.remove('listening');
+      };
+    }
+
+    function toggleAIChat() {
+      document.getElementById('aiChatWindow').classList.toggle('open');
+    }
+
+    function toggleVoiceRecognition() {
+      if (!recognition) {
+        alert("Voice recognition is not supported in this browser. Please type your message.");
+        return;
+      }
+      const voiceBtn = document.getElementById('voiceBtn');
+      if (isListening) {
+        recognition.stop();
+        isListening = false;
+        voiceBtn.classList.remove('listening');
+      } else {
+        recognition.start();
+        isListening = true;
+        voiceBtn.classList.add('listening');
+      }
+    }
+
+    function sendChatMessage() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const chatBody = document.getElementById('chatBody');
+
+      // User Bubble
+      const userBubble = document.createElement('div');
+      userBubble.className = 'chat-bubble user';
+      userBubble.innerText = text;
+      chatBody.appendChild(userBubble);
+      input.value = '';
+
+      chatBody.scrollTop = chatBody.scrollHeight;
+
+      // Generate AI Answer & Intelligent Redirect
+      setTimeout(() => {
+        let responseText = "I can assist you with health options! You can check hospital availability or calculate admission feasibility in PolicyCare.";
+        let targetRedirect = null;
+
+        const lower = text.toLowerCase();
+        if (lower.includes('icu') || lower.includes('bed') || lower.includes('hospital')) {
+          responseText = "St. Jude Heart Center currently has 8 ICU beds open, while Apex Medical is full. Let me redirect you to our live Hospitals directory.";
+          targetRedirect = 'hospitals';
+        } else if (lower.includes('insurance') || lower.includes('policy') || lower.includes('coverage') || lower.includes('claim')) {
+          responseText = "Universal Care Scheme offers 100% cashless coverage. Opening the Insurance comparison portal for you now.";
+          targetRedirect = 'policies';
+        } else if (lower.includes('nursing') || lower.includes('home care') || lower.includes('medicine') || lower.includes('pharmacy')) {
+          responseText = "We offer 24/7 Home Nursing and Express Pharmacy Delivery. Directing you to Care Continuity...";
+          targetRedirect = 'care';
+        } else if (lower.includes('admit') || lower.includes('admission') || lower.includes('triage')) {
+          responseText = "Opening the Patient Admission Triage form for immediate processing.";
+          targetRedirect = 'registration';
+        }
+
+        const botBubble = document.createElement('div');
+        botBubble.className = 'chat-bubble bot';
+        botBubble.innerText = responseText;
+        chatBody.appendChild(botBubble);
+        chatBody.scrollTop = chatBody.scrollHeight;
+
+        // Text to Speech Voice Response
+        if ('speechSynthesis' in window) {
+          const synth = window.speechSynthesis;
+          const utterThis = new SpeechSynthesisUtterance(responseText);
+          synth.speak(utterThis);
+        }
+
+        // Perform Intelligent Redirect if triggered
+        if (targetRedirect) {
+          setTimeout(() => {
+            navigateTo(targetRedirect);
+          }, 1400);
+        }
+
+      }, 600);
+    }
+
+    // LIVE CHARTING
+    function initChart() {
+      const ctx = document.getElementById('occupancyChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
+          datasets: [{
+            label: 'Network Occupancy Rate (%)',
+            data: [68, 62, 85, 89, 74, 58],
+            borderColor: '#00f0c2',
+            backgroundColor: 'rgba(0, 240, 194, 0.12)',
+            fill: true,
+            tension: 0.4,
+            borderWidth: 3,
+            pointBackgroundColor: '#00f0c2'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: '#a0aec0' }, grid: { color: '#1e3646' } },
+            y: { ticks: { color: '#a0aec0' }, grid: { color: '#1e3646' } }
+          }
+        }
+      });
+    }
+
+    function handleRegistrationSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('patientName').value;
+      const hosp = document.getElementById('preferredHospital').value;
+      const matched = hospitalsList.find(h => h.name === hosp);
+      const score = matched && matched.icuBeds > 0 ? 94 : 42;
+
+      openModal(`
+        <div style="text-align:center;">
+          <i class="fa-solid fa-microchip" style="font-size:3rem; color:var(--bright-teal); margin-bottom:1rem;"></i>
+          <h3 style="color:var(--bright-teal);">Algorithmic Triage Complete</h3>
+          <p>Patient: <strong>${name}</strong></p>
+          <div style="font-size:3rem; font-weight:900; color:${score > 70 ? 'var(--bright-teal)' : 'var(--danger)'}; margin: 1rem 0;">
+            ${score}% Feasibility Score
+          </div>
+          ${score < 70 
+            ? `<p style="color:#f87171; background:var(--danger-glow); padding:0.8rem; border-radius:8px;">⚠️ High Capacity Bottleneck: Direct admission to <strong>${hosp}</strong> is restricted. Rerouting automatically recommended to <strong>${matched.alternative}</strong>.</p>` 
+            : '<p style="color:#34d399;">✅ Pathway cleared. Patient pre-approved for immediate cashless admission.</p>'}
+        </div>
+        <button class="btn" style="width:100%; margin-top:1.5rem;" onclick="closeModal(); navigateTo('dashboard');">Confirm & Lock Admission Slot</button>
+      `);
+    }
+
+    function handleSubSubmit(e, msg) {
+      e.preventDefault();
+      openModal(`
+        <div style="text-align:center;">
+          <i class="fa-solid fa-circle-check" style="font-size:3rem; color:var(--bright-teal); margin-bottom:1rem;"></i>
+          <h3 style="color:var(--bright-teal);">${msg}</h3>
+          <p style="margin: 1rem 0; color:var(--text-muted);">Details have been logged into PolicyCare core engine.</p>
+        </div>
+        <button class="btn" style="width:100%; margin-top:1rem;" onclick="closeModal(); navigateTo('dashboard');">Back to Dashboard</button>
+      `);
+    }
+
+    function triggerSOS() {
+      openModal(`
+        <div style="text-align:center;">
+          <i class="fa-solid fa-truck-medical" style="font-size:3.5rem; color:var(--danger); margin-bottom:1rem;"></i>
+          <h3 style="color:var(--danger);">🚨 SOS CRITICAL EMERGENCY TRIGGERED</h3>
+          <p style="margin: 1rem 0;">Direct priority dispatch initiated. Patient live location is being transmitted to nearest vacant emergency triage center...</p>
+        </div>
+        <button class="btn btn-secondary" style="width:100%; margin-top:1.5rem;" onclick="closeModal()">Dismiss Alert</button>
+      `);
+    }
+
+    function openModal(html) {
+      document.getElementById('modalBody').innerHTML = html;
+      document.getElementById('modalOverlay').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
+    }
+
+    window.onload = () => {
+      renderDynamicCards();
+      initChart();
+    };
+  </script>
+</body>
+</html>
